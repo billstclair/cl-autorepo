@@ -1,0 +1,43 @@
+cl-autorepo is a simple lisp library to ease inclusion of
+non-Quicklisp libraries from repositories.
+
+For example, to load my File System DataBase library:
+
+  (ql:quickload "cl-autorepo")
+  (cl-autorepo:find-system "fsdb" "https://github.com/billstclair/fsdb" :git)
+  (ql:quickload "fsdb")
+
+You can add ADD-SYSTEM calls to your library system definition (.asd)
+files, to auto-download systems that aren't yet in Quicklisp.
+
+Downloaded systems are kept in the "systems" sub-directory of the
+cl-autorepo source directory. For now, you've got to arrange for
+cl-autorepo to be known to ASDF. Hopefully, Zach Beane will add it
+soon to Quicklisp. Until then, put the following in the file
+~/.config/common-lisp/source-registry.conf.d/cl-autorepo.conf:
+
+  (:source-registry
+    :inherit-configuration
+    (:directory "/path/to/cl-autorepo/"))
+
+changing "/path/to" to the path to wherever you put cl-autorepo on
+your system.
+
+There is currently no support for updating libraries. You can easily
+do that yourself with "git pull", "svn update", etc.
+
+I've included support for git, svn, darcs, and hg. You can add another
+respository type with a simple DOWNLOAD-REPO method. Send it to me,
+and I'll add it.
+
+One way to autoload cl-autorepo itself is the code below:
+
+(unless (ql:quickload "cl-autorepo")
+  (asdf:run-shell-command
+   "mkdir -p ~/lisp;cd ~/lisp;git clone https://github.com/billstclair/cl-autorepo")
+  (load "~/lisp/cl-autorepo.asd")
+  (ql:quickload "cl-autorepo"))
+
+Bill St. Clair
+bill@billstclair.com
+11 August, 2011
