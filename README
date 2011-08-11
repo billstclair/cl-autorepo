@@ -4,7 +4,7 @@ non-Quicklisp libraries from repositories.
 For example, to load my File System DataBase library:
 
   (ql:quickload "cl-autorepo")
-  (cl-autorepo:find-system "fsdb" "https://github.com/billstclair/fsdb" :git)
+  (cl-autorepo:add-system "fsdb" "https://github.com/billstclair/fsdb" :git)
   (ql:quickload "fsdb")
 
 You can add ADD-SYSTEM calls to your library system definition (.asd)
@@ -30,13 +30,19 @@ I've included support for git, svn, darcs, and hg. You can add another
 respository type with a simple DOWNLOAD-REPO method. Send it to me,
 and I'll add it.
 
-One way to autoload cl-autorepo itself is the code below:
+One way to autoload cl-autorepo itself, before it becomes part of
+Quicklisp, is the code below:
 
-(unless (ql:quickload "cl-autorepo")
-  (asdf:run-shell-command
-   "mkdir -p ~/lisp;cd ~/lisp;git clone https://github.com/billstclair/cl-autorepo")
-  (load "~/lisp/cl-autorepo.asd")
+(load "~/quicklisp/setup")              ;may be in your init file
+
+(unless (ignore-errors (ql:quickload "cl-autorepo"))
+  (let ((dir "~/lisp")
+        (url "https://github.com/billstclair/cl-autorepo"))
+    (asdf:run-shell-command "mkdir -p ~a;cd ~a;git clone ~a" dir dir url))
+  (load "~/lisp/cl-autorepo/cl-autorepo.asd")
   (ql:quickload "cl-autorepo"))
+
+Tested in ccl 1.7-r14927M and SBCL 1.0.49.0.debian
 
 Bill St. Clair
 bill@billstclair.com
