@@ -6,20 +6,17 @@
 ;;; known to ASDF
 ;;;
 
-(defparameter *autorepo-source-dir*
-  (asdf:system-source-directory (asdf:find-system "cl-autorepo")))
-
 (defparameter *repo-dir*
-  (merge-pathnames "systems/" *autorepo-source-dir*))
+  (asdf:system-relative-pathname "cl-autorepo" "systems/"))
 
 (defparameter *autorepo-asdf-config-file*
-  (merge-pathnames "autorepo.conf" *autorepo-source-dir*))
+  (asdf:system-relative-pathname "cl-autorepo" "autorepo.conf"))
 
 (defun add-system (name url &optional (repository-type :git))
   "Download the system named NAME of REPOSITORY-TYPE
 from the URL, unless it's already defined."
   (initialize-autorepo-source-registry)
-  (or (ignore-errors (asdf:find-system name))
+  (or (asdf:find-system name nil)
       (progn (download-repo repository-type url *repo-dir*)
              (initialize-autorepo-source-registry)
              (asdf:find-system name))))
