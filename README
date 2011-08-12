@@ -25,13 +25,18 @@ Quicklisp, is the code below:
 
 (load "~/quicklisp/setup")              ;may be in your init file
 
-(unless (ignore-errors (ql:quickload "cl-autorepo"))
+(unless (or (find-package :cl-autorepo)
+            (ignore-errors (ql:quickload "cl-autorepo")))
   (let* ((dir "~/.local/share/common-lisp/source/")
          (autorepo-asd (merge-pathnames "cl-autorepo/cl-autorepo.asd" dir))
          (url "https://github.com/billstclair/cl-autorepo"))
     (asdf:run-shell-command "mkdir -p ~a;cd ~a;git clone ~a" dir dir url)
     (load autorepo-asd)
     (ql:quickload "cl-autorepo")))
+
+For an example of using cl-autorepo in a real system, see:
+
+  https://github.com/billstclair/truledger/blob/master/truledger.asd
 
 Tested in ccl 1.7-r14927M and SBCL 1.0.49.0.debian
 
