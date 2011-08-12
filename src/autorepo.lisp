@@ -6,11 +6,9 @@
 ;;; known to ASDF
 ;;;
 
+;; ASDF looks here by default
 (defparameter *repo-dir*
-  (asdf:system-relative-pathname "cl-autorepo" "systems/"))
-
-(defparameter *autorepo-asdf-config-file*
-  (asdf:system-relative-pathname "cl-autorepo" "autorepo.conf"))
+  (merge-pathnames ".local/share/common-lisp/source/" (user-homedir-pathname)))
 
 (defun add-system (name url &optional (repository-type :git))
   "Download the system named NAME of REPOSITORY-TYPE
@@ -22,7 +20,10 @@ from the URL, unless it's already defined."
              (asdf:find-system name))))
 
 (defun initialize-autorepo-source-registry ()
-  (asdf:initialize-source-registry *autorepo-asdf-config-file*))
+  (asdf:initialize-source-registry
+   `(:source-registry
+     :inherit-configuration
+     (:tree ,*repo-dir*))))
 
 (defgeneric download-repo (repository-type url directory)
   (:documentation "Download a repository of REPOSITORY-TYPE from URL, as a

@@ -10,18 +10,8 @@ For example, to load my File System DataBase library:
 You can add ADD-SYSTEM calls to your library system definition (.asd)
 files, to auto-download systems that aren't yet in Quicklisp.
 
-Downloaded systems are kept in the "systems" sub-directory of the
-cl-autorepo source directory. For now, you've got to arrange for
-cl-autorepo to be known to ASDF. Hopefully, Zach Beane will add it
-soon to Quicklisp. Until then, put the following in the file
-~/.config/common-lisp/source-registry.conf.d/cl-autorepo.conf:
-
-  (:source-registry
-    :inherit-configuration
-    (:directory "/path/to/cl-autorepo/"))
-
-changing "/path/to" to the path to wherever you put cl-autorepo on
-your system.
+Downloaded systems are kept in ~/.local/share/common-lisp/source/,
+which is one of the places ASDF looks for systems by default.
 
 There is currently no support for updating libraries. You can easily
 do that yourself with "git pull", "svn update", etc.
@@ -36,11 +26,12 @@ Quicklisp, is the code below:
 (load "~/quicklisp/setup")              ;may be in your init file
 
 (unless (ignore-errors (ql:quickload "cl-autorepo"))
-  (let ((dir "~/lisp")
-        (url "https://github.com/billstclair/cl-autorepo"))
-    (asdf:run-shell-command "mkdir -p ~a;cd ~a;git clone ~a" dir dir url))
-  (load "~/lisp/cl-autorepo/cl-autorepo.asd")
-  (ql:quickload "cl-autorepo"))
+  (let* ((dir "~/.local/share/common-lisp/source/")
+         (autorepo-asd (merge-pathnames "cl-autorepo/cl-autorepo.asd" dir))
+         (url "https://github.com/billstclair/cl-autorepo"))
+    (asdf:run-shell-command "mkdir -p ~a;cd ~a;git clone ~a" dir dir url)
+    (load autorepo-asd)
+    (ql:quickload "cl-autorepo")))
 
 Tested in ccl 1.7-r14927M and SBCL 1.0.49.0.debian
 
