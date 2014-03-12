@@ -13,17 +13,16 @@
 (defun add-system (name url &optional (repository-type :git))
   "Download the system named NAME of REPOSITORY-TYPE
 from the URL, unless it's already defined."
-  (initialize-autorepo-source-registry)
   (or (asdf:find-system name nil)
-      (progn (download-repo repository-type url *repo-dir*)
-             (initialize-autorepo-source-registry)
-             (asdf:find-system name))))
-
-(defun initialize-autorepo-source-registry ()
-  (asdf:initialize-source-registry
-   `(:source-registry
-     :inherit-configuration
-     (:tree ,*repo-dir*))))
+      (let ((path (merge-pathnames
+                   (make-pathname :directory `(:relative ,name)
+                                  :name name
+                                  :type "asd")
+                   *repo-dir*)))
+        (unless (ignore-errors (load path))
+          (download-repo repository-type url *repo-dir*)
+          (load path))
+        (asdf:find-system name))))
 
 (defgeneric download-repo (repository-type url directory)
   (:documentation "Download a repository of REPOSITORY-TYPE from URL, as a
