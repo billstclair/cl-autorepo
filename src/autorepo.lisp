@@ -28,21 +28,22 @@ from the URL, unless it's already defined."
   (:documentation "Download a repository of REPOSITORY-TYPE from URL, as a
 subdirectory of DIRECTORY. REPOSITORY-TYPE can be :GIT, :SVN, :DARCS, or :HG"))
 
+(defun download-repo-helper (program-args directory url)
+  (uiop:run-program
+   `(,@program-args ,(uiop:native-namestring (truename directory)) ,url)
+   :directory directory :output :interactive :error-output :interactive))
+
 (defmethod download-repo ((repository-type (eql :git)) url directory)
-  (asdf:run-shell-command "cd '~a'; git clone '~a'"
-                          (truename directory) url))
+  (download-repo-helper '("git" "clone") directory url))
 
 (defmethod download-repo ((repository-type (eql :svn)) url directory)
-  (asdf:run-shell-command "cd '~a'; svn co '~a'"
-                          (truename directory) url))
+  (download-repo-helper '("svn" "co") directory url))
 
 (defmethod download-repo ((repository-type (eql :darcs)) url directory)
-  (asdf:run-shell-command "cd '~a'; darcs get '~a'"
-                          (truename directory) url))
+  (download-repo-helper '("darcs" "get") directory url))
 
 (defmethod download-repo ((repository-type (eql :hg)) url directory)
-  (asdf:run-shell-command "cd '~a'; hg clone '~a'"
-                          (truename directory) url))
+  (download-repo-helper '("hg" "clone") directory url))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
