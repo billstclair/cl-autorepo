@@ -29,9 +29,8 @@ from the URL, unless it's already defined."
 subdirectory of DIRECTORY. REPOSITORY-TYPE can be :GIT, :SVN, :DARCS, or :HG"))
 
 (defun download-repo-helper (program-args directory url)
-  (uiop:run-program
-   `(,@program-args ,(uiop:native-namestring (truename directory)) ,url)
-   :directory directory :output :interactive :error-output :interactive))
+  (uiop:run-program `(,@program-args ,url)
+                    :directory directory :output :interactive :error-output :interactive))
 
 (defmethod download-repo ((repository-type (eql :git)) url directory)
   (download-repo-helper '("git" "clone") directory url))

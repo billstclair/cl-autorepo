@@ -1,4 +1,4 @@
-(defsystem "cl-autorepo"
+(asdf:defsystem "cl-autorepo"
   :description "A simple mechanism to auto-load ASDF systems from repositories."
   :author "Bill St. Clair <bill@billstclair.com>"
   :version "1.0.0"
